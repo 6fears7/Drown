@@ -5,13 +5,12 @@ using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 using RainMeadow;
-
+using HUD;
 namespace Drown
 {
     public class StoreOverlay : Menu.Menu
     {
         public AbstractCreature? spectatee;
-
         public Vector2 pos;
 
 
@@ -25,8 +24,8 @@ namespace Drown
             public Dictionary<string, int> storeItems;
             public StoreOverlay overlay;
             public int cost;
-            public bool didRespawn = false;
-            public ItemButton(StoreOverlay menu, Vector2 pos, RainWorldGame game, DrownMode drown, KeyValuePair<string, int> itemEntry, int index, bool canBuy = false)
+            public bool didRespawn;
+            public ItemButton(StoreOverlay menu, Vector2 pos, RainWorldGame game, ArenaOnlineGameMode arena, DrownMode drown, KeyValuePair<string, int> itemEntry, int index, bool canBuy = false)
             {
                 this.overlay = menu;
                 this.cost = itemEntry.Value;
@@ -36,118 +35,151 @@ namespace Drown
 
                 this.button.OnClick += (_) =>
                 {
-                foreach (var player in game.GetArenaGameSession.Players)
-                {
-                    if (OnlinePhysicalObject.map.TryGetValue(player, out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
+                    var copyofSession = game.GetArenaGameSession.Players;
+                    //foreach (var player in copyofSession)
+                    //{
+                    //    if (OnlinePhysicalObject.map.TryGetValue(player, out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
+                    //    {
+                    //        myAbstractPos = player.pos;
+                    //        AbstractPhysicalObject desiredObject = null;
+                    switch (index)
                     {
-                        myAbstractPos = player.pos;
-                        AbstractPhysicalObject desiredObject = null;
-                        switch (index)
-                        {
-                            case 0:
-                                desiredObject = new AbstractSpear(game.world, null, myAbstractPos, game.GetNewID(), false);
-                                break;
-                            case 1:
-                                    // not-online-aware removal
-                                    if (!didRespawn) // NUKE SLUGCATS!
+                        case 0:
+                            //desiredObject = new AbstractSpear(game.world, null, myAbstractPos, game.GetNewID(), false);
+                            break;
+                        case 1:
+                            //desiredObject = new AbstractSpear(game.world, null, myAbstractPos, game.GetNewID(), true);
+                            break;
+                        case 2:
+                            didRespawn = false;
+
+                            for (int i = copyofSession.Count - 1; i >= 0; i--)
+                            {
+                                if (copyofSession[i] is AbstractPhysicalObject apo && OnlinePhysicalObject.map.TryGetValue(apo, out var oe))
+                                {
+
+                                    //oe.owner == OnlineManager.mePlayer && game.GetArenaGameSession.room.abstractRoom.entities[i] is AbstractCreature && (game.GetArenaGameSession.room.abstractRoom.entities[i] as AbstractCreature).creatureTemplate.type == CreatureTemplate.Type.Slugcat
+                                    oe.beingMoved = true;
+
+                                    if (oe.apo.realizedObject is Creature c && c.inShortcut)
                                     {
-                                        for (int i = player.Room.entities.Count - 1; i >= 0; i--)
+                                        if (c.RemoveFromShortcuts()) c.inShortcut = false;
+                                    }
+
+                                    game.GetArenaGameSession.room.abstractRoom.entities.Remove(oe.apo);
+
+                                    game.GetArenaGameSession.room.abstractRoom.creatures.Remove(oe.apo as AbstractCreature);
+                                    game.GetArenaGameSession.Players.Remove(oe.apo as AbstractCreature);
+                                    game.GetArenaGameSession.room.abstractRoom.realizedRoom.RemoveObject(oe.apo.realizedObject);
+                                    Room room = game.GetArenaGameSession.room;
+
+                                    OnlineManager.lobby.playerAvatars.RemoveAll(kvp => kvp.Key.Equals(oe.owner) && kvp.Value.Equals(oe.owner.id));
+
+                                    var spectatorHuds = game.cameras[0].hud.parts.Where(x => x is SpectatorHud);
+
+
+                                    foreach (var onlineHud in spectatorHuds)
+                                    {
+                                        foreach (var btn in (onlineHud as SpectatorHud).spectatorOverlay.playerButtons)
                                         {
-                                            if (player.Room.entities[i] is AbstractPhysicalObject apo && OnlinePhysicalObject.map.TryGetValue(apo, out var oe))
+                                            if (btn.player == oe)
                                             {
-                                                onlineP.beingMoved = true;
-
-                                                if (onlineP.apo.realizedObject is Creature c && c.inShortcut)
-                                                {
-                                                    if (c.RemoveFromShortcuts()) c.inShortcut = false;
-                                                }
-
-                                                player.Room.entities.Remove(onlineP.apo);
-
-                                                player.Room.creatures.Remove(onlineP.apo as AbstractCreature);
-
-                                                player.Room.realizedRoom.RemoveObject(onlineP.apo.realizedObject);
-                                                Room room = player.Room.realizedRoom;
-                                                //room.CleanOutObjectNotInThisRoom(oe.apo.realizedObject);
-                                                onlineP.beingMoved = false;
-                                                game.GetArenaGameSession.SpawnPlayers(player.Room.realizedRoom, new List<int>(player.Room.exits));
+                                                (onlineHud as SpectatorHud).spectatorOverlay.playerButtons.Remove(btn);
                                             }
                                         }
-                                        didRespawn = true;
-                                    }
+                                        //OnlinePlayerDisplay usernameDisplay = null;
 
-                                        break;
-                                case 2:
-                                            game.GetArenaGameSession.SpawnPlayers(player.Room.realizedRoom, new List<int>(player.Room.exits));
-                                            break;
-                                        }
-                                        if (desiredObject != null)
-                                        {
-                                            (game.cameras[0].room.abstractRoom).AddEntity(desiredObject);
-                                            desiredObject.RealizeInRoom();
-                                        }
-                                        drown.currentPoints = drown.currentPoints - itemEntry.Value;
+                                        //foreach (var part in onlineHud.parts.OfType<OnlinePlayerDisplay>())
+                                        //{
+
+                                        //}
+                                        ////player.Room.realizedRoom.CleanOutObjectNotInThisRoom(oe.apo.realizedObject);
+                                        //oe.beingMoved = false;
                                     }
                                 }
-                        };
-                        this.button.owner.subObjects.Add(button);
-                    }
+                            }
+                            didRespawn = true;
+                            if (didRespawn)
+                            {
+                                game.GetArenaGameSession.SpawnPlayers(game.GetArenaGameSession.room, new List<int>(game.GetArenaGameSession.room.abstractRoom.exits));
+                                game.cameras[0].hud.AddPart(new OnlineHUD(game.cameras[0].hud, game.cameras[0], arena));
 
-                    public void Destroy()
-                    {
-                        this.button.RemoveSprites();
-                        this.button.page.RemoveSubObject(this.button);
+                            }
+                            didRespawn = false;
+
+                            break;
                     }
-                }
+                    //if (desiredObject != null)
+                    //{
+                    //    (game.cameras[0].room.abstractRoom).AddEntity(desiredObject);
+                    //    desiredObject.RealizeInRoom();
+                    //}
+                    drown.currentPoints = drown.currentPoints - itemEntry.Value;
+                    //  }
+                    //}
+                };
+                this.button.owner.subObjects.Add(button);
+            }
+
+            public void Destroy()
+            {
+                this.button.RemoveSprites();
+                this.button.page.RemoveSubObject(this.button);
+            }
+        }
 
         public RainWorldGame game;
-            public List<ItemButton> storeItemList;
-            ItemButton itemButtons;
-            public DrownMode drown;
+        public List<ItemButton> storeItemList;
+        ItemButton itemButtons;
+        public DrownMode drown;
 
-            public StoreOverlay(ProcessManager manager, RainWorldGame game, DrownMode drown) : base(manager, RainMeadow.RainMeadow.Ext_ProcessID.SpectatorMode)
-            {
-                this.game = game;
-                this.drown = drown;
-                this.pages.Add(new Page(this, null, "store", 0));
-                this.selectedObject = null;
-                this.storeItemList = new();
-                this.pos = new Vector2(180, 553);
-                this.pages[0].subObjects.Add(new Menu.MenuLabel(this, this.pages[0], this.Translate("STORE"), new(pos.x, pos.y + 30f), new(110, 30), true));
-                var storeItems = new Dictionary<string, int> {
+        public StoreOverlay(ProcessManager manager, RainWorldGame game, DrownMode drown, ArenaOnlineGameMode arena) : base(manager, RainMeadow.RainMeadow.Ext_ProcessID.SpectatorMode)
+        {
+            this.game = game;
+            this.drown = drown;
+            this.pages.Add(new Page(this, null, "store", 0));
+            this.selectedObject = null;
+            this.storeItemList = new();
+            this.pos = new Vector2(180, 553);
+            this.pages[0].subObjects.Add(new Menu.MenuLabel(this, this.pages[0], this.Translate("STORE"), new(pos.x, pos.y + 30f), new(110, 30), true));
+            var storeItems = new Dictionary<string, int> {
             { "Spear", 0 },
-            { "Explosive Spear", 0 },
+            { "Explosive Spear", 5 },
             { "Respawn", 0 },
 
         };
-                int index = 0; // Initialize an index variable
+            int index = 0; // Initialize an index variable
 
-                foreach (var item in storeItems)
-                {
-                    // Format the message for the button, for example: "Spear: 1"
-                    string buttonMessage = $"{item.Key}: {item.Value}";
+            foreach (var item in storeItems)
+            {
+                // Format the message for the button, for example: "Spear: 1"
+                string buttonMessage = $"{item.Key}: {item.Value}";
 
-                    // Create a new ItemButton for each dictionary entry
-                    this.itemButtons = new ItemButton(this, pos, game, drown, item, index, true);
-                    this.storeItemList.Add(itemButtons);
+                // Create a new ItemButton for each dictionary entry
+                this.itemButtons = new ItemButton(this, pos, game, arena, drown, item, index, true);
+                this.storeItemList.Add(itemButtons);
 
 
-                    pos.y -= 40; // Move the button 40 units down for the next one
-                    index++;
-                }
-
+                pos.y -= 40; // Move the button 40 units down for the next one
+                index++;
             }
 
-            public override void Update()
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (storeItemList != null)
             {
-                base.Update();
-                if (storeItemList != null)
+                for (int i = 0; i < storeItemList.Count; i++)
                 {
-                    for (int i = 0; i < storeItemList.Count; i++)
-                    {
-                        storeItemList[i].button.buttonBehav.greyedOut = drown.currentPoints < storeItemList[i].cost;
-                    }
+                    storeItemList[i].button.buttonBehav.greyedOut = drown.currentPoints < storeItemList[i].cost;
                 }
+            }
+            foreach (var player in OnlineManager.lobby.playerAvatars)
+            {
+                RainMeadow.RainMeadow.Debug(player);
             }
         }
     }
+}

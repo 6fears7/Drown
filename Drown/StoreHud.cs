@@ -14,24 +14,29 @@ namespace Drown
             this.camera = camera;
             this.game = camera.game;
             this.drown = drown;
+            this.drown.isInStore = true;
         }
 
         public override void Draw(float timeStacker)
         {
             base.Draw(timeStacker);
-           
-            if (Input.GetKeyDown(RainMeadow.RainMeadow.rainMeadowOptions.SpectatorKey.Value))
+
+            if (RainMeadow.RainMeadow.isArenaMode(out var arena))
             {
-                if (storeOverlay == null)
+                if (Input.GetKeyDown(RainMeadow.RainMeadow.rainMeadowOptions.SpectatorKey.Value))
                 {
-                    RainMeadow.RainMeadow.Debug("Creating spectator overlay");
-                    storeOverlay = new StoreOverlay(game.manager, game, drown);
-                }
-                else
-                {
-                    RainMeadow.RainMeadow.Debug("Spectate destroy!");
-                    storeOverlay.ShutDownProcess();
-                    storeOverlay = null;
+                    if (storeOverlay == null)
+                    {
+                        RainMeadow.RainMeadow.Debug("Creating storeOverlay overlay");
+                        storeOverlay = new StoreOverlay(game.manager, game, drown, arena);
+                    }
+                    else
+                    {
+                        RainMeadow.RainMeadow.Debug("storeOverlay destroy!");
+                        this.drown.isInStore = false;
+                        storeOverlay.ShutDownProcess();
+                        storeOverlay = null;
+                    }
                 }
             }
 
@@ -53,6 +58,7 @@ namespace Drown
                     if (game.arenaOverlay != null || game.pauseMenu != null || game.manager.upcomingProcess != null)
                     {
                         RainMeadow.RainMeadow.Debug("Shutting down storeOverlay overlay due to another process request");
+                        this.drown.isInStore = false;
                         storeOverlay.ShutDownProcess();
                         storeOverlay = null;
                         return;

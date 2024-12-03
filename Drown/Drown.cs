@@ -8,7 +8,7 @@ namespace Drown
     {
 
         public static ArenaSetup.GameTypeID Drown = new ArenaSetup.GameTypeID("Drown", register: true);
-
+        public bool isInStore = false;
 
         public int currentPoints;
         public int scoreToWin;
@@ -84,15 +84,19 @@ namespace Drown
             currentPoints = self.arenaSitting.players[playerIndex].score;
         }
 
-        public override void HUD_InitMultiplayerHud(ArenaOnlineGameMode arena, On.HUD.HUD.orig_InitMultiplayerHud orig, HUD.HUD self, ArenaGameSession session)
+        public override void HUD_InitMultiplayerHud(ArenaOnlineGameMode arena, HUD.HUD self, ArenaGameSession session)
         {
-            base.HUD_InitMultiplayerHud(arena, orig, self, session);
+            base.HUD_InitMultiplayerHud(arena, self, session);
             self.AddPart(new StoreHUD(self, session.game.cameras[0], this));
         }
 
         public override bool HoldFireWhileTimerIsActive(ArenaOnlineGameMode arena)
         {
             return arena.countdownInitiatedHoldFire = false;
+        }
+        public override string AddCustomIcon(ArenaOnlineGameMode arena)
+        {
+            return "ShortcutGate";
         }
     }
 }
