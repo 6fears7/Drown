@@ -10,8 +10,9 @@ namespace Drown
 {
     public class StoreOverlay : Menu.Menu
     {
-        public AbstractCreature? spectatee;
+        public AbstractCreature? me;
         public Vector2 pos;
+
 
 
         public class ItemButton
@@ -24,10 +25,12 @@ namespace Drown
             public Dictionary<string, int> storeItems;
             public StoreOverlay overlay;
             public int cost;
+            public string name;
             public bool didRespawn;
             public ItemButton(StoreOverlay menu, Vector2 pos, RainWorldGame game, ArenaOnlineGameMode arena, DrownMode drown, KeyValuePair<string, int> itemEntry, int index, bool canBuy = false)
             {
                 this.overlay = menu;
+                this.name = itemEntry.Key;
                 this.cost = itemEntry.Value;
                 this.button = new RainMeadow.SimplerButton(menu, menu.pages[0], $"{itemEntry.Key}: {itemEntry.Value}", pos, new Vector2(110, 30));
                 WorldCoordinate myAbstractPos;
@@ -140,16 +143,32 @@ namespace Drown
         public override void Update()
         {
             base.Update();
+            foreach (var c in game.Players)
+            {
+                if (OnlinePhysicalObject.map.TryGetValue(c, out var onlineC))
+                {
+
+                    if (onlineC.owner == OnlineManager.mePlayer)
+                    {
+                        me = c;
+                    }
+
+                }
+            }
             if (storeItemList != null)
             {
                 for (int i = 0; i < storeItemList.Count; i++)
                 {
-                    storeItemList[i].button.buttonBehav.greyedOut = drown.currentPoints < storeItemList[i].cost;
+                    if (me == null && storeItemList[i].name == "Revive")
+                    {
+                        storeItemList[i].button.buttonBehav.greyedOut = true;
+                    }
+                    else
+                    {
+                        storeItemList[i].button.buttonBehav.greyedOut = drown.currentPoints < storeItemList[i].cost;
+                    }
                 }
-            }
-            foreach (var player in OnlineManager.lobby.playerAvatars)
-            {
-                RainMeadow.RainMeadow.Debug(player);
+
             }
         }
 
@@ -165,7 +184,7 @@ namespace Drown
             self.dead = false;
             self.killTag = null;
             self.killTagCounter = 0;
-            
+
         }
 
     }
