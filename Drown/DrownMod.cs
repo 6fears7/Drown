@@ -41,7 +41,6 @@ namespace Drown
             {
                 Logger.LogError(e);
                 fullyInit = false;
-                //throw;
             }
         }
 

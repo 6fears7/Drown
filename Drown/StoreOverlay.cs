@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 using RainMeadow;
-using HUD;
+
 namespace Drown
 {
     public class StoreOverlay : Menu.Menu
@@ -50,23 +50,15 @@ namespace Drown
                                     desiredObject = new AbstractSpear(game.world, null, copyofSession[i].pos, game.GetNewID(), true);
                                     break;
                                 case 2:
+                                    desiredObject = new AbstractPhysicalObject(game.world, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, null, copyofSession[i].pos, game.GetNewID());
+                                    break;
+
+                                case 3:
                                     didRespawn = false;
-
-
                                     var room = copyofSession[i].Room.realizedRoom;
                                     var node = copyofSession[i].realizedCreature.coord.abstractNode;
 
-                                    //RainMeadow.RainMeadow.sSpawningAvatar = true;
-                                    //AbstractCreature abstractCreature = new AbstractCreature(game.world, StaticWorld.GetCreatureTemplate("Slugcat"), null, new WorldCoordinate(0, -1, -1, -1), new EntityID(-1, 0));
-                                    //abstractCreature.pos.room = game.world.GetAbstractRoom(0).index;
-                                    //abstractCreature.pos.abstractNode = room.ShortcutLeadingToNode(1).destNode;
-
-
-                                    //RainMeadow.RainMeadow.Debug("assigned ac, registering");
-
-                                    //game.world.GetResource().ApoEnteringWorld(abstractCreature);
-                                    //RainMeadow.RainMeadow.sSpawningAvatar = false;
-
+                                    RevivePlayer(copyofSession[i].realizedCreature as Player);
 
                                     copyofSession[i].realizedCreature.RemoveFromRoom();
                                     if (node > room.abstractRoom.exits) node = UnityEngine.Random.Range(0, room.abstractRoom.exits);
@@ -78,14 +70,13 @@ namespace Drown
 
                                     game.shortcuts.betweenRoomsWaitingLobby.Add(shortCutVessel);
 
-
-
-
                                     didRespawn = true;
-
-
+                                    break;
+                                case 4:
+                                    drown.openedDen = true;
                                     break;
                             }
+
                             if (desiredObject != null)
                             {
                                 (game.cameras[0].room.abstractRoom).AddEntity(desiredObject);
@@ -121,8 +112,11 @@ namespace Drown
             this.pages[0].subObjects.Add(new Menu.MenuLabel(this, this.pages[0], this.Translate("STORE"), new(pos.x, pos.y + 30f), new(110, 30), true));
             var storeItems = new Dictionary<string, int> {
             { "Spear", 0 },
-            { "Explosive Spear", 5 },
-            { "Respawn", 0 },
+            { "Explosive Spear", 3 },
+            { "Scavenger Bomb", 0 },
+            { "Respawn", 5 },
+            { "Open Den", 0 },
+
 
         };
             int index = 0; // Initialize an index variable
@@ -158,5 +152,21 @@ namespace Drown
                 RainMeadow.RainMeadow.Debug(player);
             }
         }
+
+        private static void RevivePlayer(Player self)
+        {
+
+            self.stun = 20;
+            self.airInLungs = 0.1f;
+            self.exhausted = true;
+            self.aerobicLevel = 1;
+            self.playerState.alive = true;
+            self.playerState.permaDead = false;
+            self.dead = false;
+            self.killTag = null;
+            self.killTagCounter = 0;
+            
+        }
+
     }
 }

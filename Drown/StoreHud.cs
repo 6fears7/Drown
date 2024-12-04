@@ -14,7 +14,6 @@ namespace Drown
             this.camera = camera;
             this.game = camera.game;
             this.drown = drown;
-            this.drown.isInStore = true;
         }
 
         public override void Draw(float timeStacker)
@@ -29,6 +28,8 @@ namespace Drown
                     {
                         RainMeadow.RainMeadow.Debug("Creating storeOverlay overlay");
                         storeOverlay = new StoreOverlay(game.manager, game, drown, arena);
+                        this.drown.isInStore = true;
+
                     }
                     else
                     {
@@ -51,7 +52,6 @@ namespace Drown
             base.Update();
             if (storeOverlay != null)
             {
-
                 if (RainMeadow.RainMeadow.isArenaMode(out var _))
                 {
 
