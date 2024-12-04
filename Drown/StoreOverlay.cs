@@ -114,8 +114,8 @@ namespace Drown
             { "Spear", 0 },
             { "Explosive Spear", 3 },
             { "Scavenger Bomb", 3 },
-            { "Respawn", 5 },
-            { "Open Den", 0 },
+            { "Revive", 5 },
+            { "Open Den", 50 },
 
 
         };
