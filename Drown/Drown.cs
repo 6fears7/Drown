@@ -76,10 +76,10 @@ namespace Drown
             return ++timer;
         }
 
-        public override void Killing(ArenaOnlineGameMode arena, On.ArenaGameSession.orig_Killing orig, ArenaGameSession self, Player player, Creature killedCrit, int playerIndex)
+        public override void LandSpear(ArenaOnlineGameMode arena, ArenaGameSession self, Player player, Creature target, ArenaSitting.ArenaPlayer aPlayer)
         {
-            self.arenaSitting.players[playerIndex].score++;
-            currentPoints = self.arenaSitting.players[playerIndex].score;
+            aPlayer.score++;
+            currentPoints = aPlayer.score;
         }
 
         public override void HUD_InitMultiplayerHud(ArenaOnlineGameMode arena, HUD.HUD self, ArenaGameSession session)

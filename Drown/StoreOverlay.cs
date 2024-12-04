@@ -36,28 +36,23 @@ namespace Drown
                 this.button.OnClick += (_) =>
                 {
                     var copyofSession = game.GetArenaGameSession.Players;
-                    //foreach (var player in copyofSession)
-                    //{
-                    //    if (OnlinePhysicalObject.map.TryGetValue(player, out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
-                    //    {
-                    //        myAbstractPos = player.pos;
-                    //        AbstractPhysicalObject desiredObject = null;
-                    switch (index)
+                    AbstractPhysicalObject desiredObject = null;
+                    for (int i = copyofSession.Count - 1; i >= 0; i--)
                     {
-                        case 0:
-                            //desiredObject = new AbstractSpear(game.world, null, myAbstractPos, game.GetNewID(), false);
-                            break;
-                        case 1:
-                            //desiredObject = new AbstractSpear(game.world, null, myAbstractPos, game.GetNewID(), true);
-                            break;
-                        case 2:
-                            didRespawn = false;
-
-                            for (int i = copyofSession.Count - 1; i >= 0; i--)
+                        if (OnlinePhysicalObject.map.TryGetValue(copyofSession[i], out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
+                        {
+                            switch (index)
                             {
+                                case 0:
+                                    desiredObject = new AbstractSpear(game.world, null, copyofSession[i].pos, game.GetNewID(), false);
+                                    break;
+                                case 1:
+                                    desiredObject = new AbstractSpear(game.world, null, copyofSession[i].pos, game.GetNewID(), true);
+                                    break;
+                                case 2:
+                                    didRespawn = false;
 
-                                if (OnlinePhysicalObject.map.TryGetValue(copyofSession[i], out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
-                                {
+
                                     var room = copyofSession[i].Room.realizedRoom;
                                     var node = copyofSession[i].realizedCreature.coord.abstractNode;
 
@@ -71,7 +66,7 @@ namespace Drown
 
                                     //game.world.GetResource().ApoEnteringWorld(abstractCreature);
                                     //RainMeadow.RainMeadow.sSpawningAvatar = false;
-   
+
 
                                     copyofSession[i].realizedCreature.RemoveFromRoom();
                                     if (node > room.abstractRoom.exits) node = UnityEngine.Random.Range(0, room.abstractRoom.exits);
@@ -84,21 +79,21 @@ namespace Drown
                                     game.shortcuts.betweenRoomsWaitingLobby.Add(shortCutVessel);
 
 
-                                }
+
+
+                                    didRespawn = true;
+
+
+                                    break;
                             }
-                            didRespawn = true;
-
-
-                            break;
+                            if (desiredObject != null)
+                            {
+                                (game.cameras[0].room.abstractRoom).AddEntity(desiredObject);
+                                desiredObject.RealizeInRoom();
+                            }
+                            drown.currentPoints = drown.currentPoints - itemEntry.Value;
+                        }
                     }
-                    //if (desiredObject != null)
-                    //{
-                    //    (game.cameras[0].room.abstractRoom).AddEntity(desiredObject);
-                    //    desiredObject.RealizeInRoom();
-                    //}
-                    drown.currentPoints = drown.currentPoints - itemEntry.Value;
-                    //  }
-                    //}
                 };
                 this.button.owner.subObjects.Add(button);
             }
