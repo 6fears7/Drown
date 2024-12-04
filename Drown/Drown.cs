@@ -31,7 +31,7 @@ namespace Drown
 
         public override void ArenaSessionCtor(ArenaOnlineGameMode arena, On.ArenaGameSession.orig_ctor orig, ArenaGameSession self, RainWorldGame game)
         {
-            currentPoints = 0;
+            currentPoints = 5;
         }
 
         public override void InitAsCustomGameType(ArenaSetup.GameTypeSetup self)

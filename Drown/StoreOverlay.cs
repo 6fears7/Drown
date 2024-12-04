@@ -113,7 +113,7 @@ namespace Drown
             var storeItems = new Dictionary<string, int> {
             { "Spear", 0 },
             { "Explosive Spear", 3 },
-            { "Scavenger Bomb", 0 },
+            { "Scavenger Bomb", 3 },
             { "Respawn", 5 },
             { "Open Den", 0 },
 
