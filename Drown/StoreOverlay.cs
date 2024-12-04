@@ -55,57 +55,39 @@ namespace Drown
 
                             for (int i = copyofSession.Count - 1; i >= 0; i--)
                             {
-                                if (copyofSession[i] is AbstractPhysicalObject apo && OnlinePhysicalObject.map.TryGetValue(apo, out var oe))
+
+                                if (OnlinePhysicalObject.map.TryGetValue(copyofSession[i], out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
                                 {
+                                    var room = copyofSession[i].Room.realizedRoom;
+                                    var node = copyofSession[i].realizedCreature.coord.abstractNode;
 
-                                    //oe.owner == OnlineManager.mePlayer && game.GetArenaGameSession.room.abstractRoom.entities[i] is AbstractCreature && (game.GetArenaGameSession.room.abstractRoom.entities[i] as AbstractCreature).creatureTemplate.type == CreatureTemplate.Type.Slugcat
-                                    oe.beingMoved = true;
-
-                                    if (oe.apo.realizedObject is Creature c && c.inShortcut)
-                                    {
-                                        if (c.RemoveFromShortcuts()) c.inShortcut = false;
-                                    }
-
-                                    game.GetArenaGameSession.room.abstractRoom.entities.Remove(oe.apo);
-
-                                    game.GetArenaGameSession.room.abstractRoom.creatures.Remove(oe.apo as AbstractCreature);
-                                    game.GetArenaGameSession.Players.Remove(oe.apo as AbstractCreature);
-                                    game.GetArenaGameSession.room.abstractRoom.realizedRoom.RemoveObject(oe.apo.realizedObject);
-                                    Room room = game.GetArenaGameSession.room;
-
-                                    OnlineManager.lobby.playerAvatars.RemoveAll(kvp => kvp.Key.Equals(oe.owner) && kvp.Value.Equals(oe.owner.id));
-
-                                    var spectatorHuds = game.cameras[0].hud.parts.Where(x => x is SpectatorHud);
+                                    //RainMeadow.RainMeadow.sSpawningAvatar = true;
+                                    //AbstractCreature abstractCreature = new AbstractCreature(game.world, StaticWorld.GetCreatureTemplate("Slugcat"), null, new WorldCoordinate(0, -1, -1, -1), new EntityID(-1, 0));
+                                    //abstractCreature.pos.room = game.world.GetAbstractRoom(0).index;
+                                    //abstractCreature.pos.abstractNode = room.ShortcutLeadingToNode(1).destNode;
 
 
-                                    foreach (var onlineHud in spectatorHuds)
-                                    {
-                                        foreach (var btn in (onlineHud as SpectatorHud).spectatorOverlay.playerButtons)
-                                        {
-                                            if (btn.player == oe)
-                                            {
-                                                (onlineHud as SpectatorHud).spectatorOverlay.playerButtons.Remove(btn);
-                                            }
-                                        }
-                                        //OnlinePlayerDisplay usernameDisplay = null;
+                                    //RainMeadow.RainMeadow.Debug("assigned ac, registering");
 
-                                        //foreach (var part in onlineHud.parts.OfType<OnlinePlayerDisplay>())
-                                        //{
+                                    //game.world.GetResource().ApoEnteringWorld(abstractCreature);
+                                    //RainMeadow.RainMeadow.sSpawningAvatar = false;
+   
 
-                                        //}
-                                        ////player.Room.realizedRoom.CleanOutObjectNotInThisRoom(oe.apo.realizedObject);
-                                        //oe.beingMoved = false;
-                                    }
+                                    copyofSession[i].realizedCreature.RemoveFromRoom();
+                                    if (node > room.abstractRoom.exits) node = UnityEngine.Random.Range(0, room.abstractRoom.exits);
+
+                                    var shortCutVessel = new ShortcutHandler.ShortCutVessel(room.ShortcutLeadingToNode(node).DestTile, copyofSession[i].realizedCreature, game.world.GetAbstractRoom(0), 0);
+
+                                    shortCutVessel.entranceNode = copyofSession[i].pos.abstractNode;
+                                    shortCutVessel.room = game.world.GetAbstractRoom(copyofSession[i].Room.name);
+
+                                    game.shortcuts.betweenRoomsWaitingLobby.Add(shortCutVessel);
+
+
                                 }
                             }
                             didRespawn = true;
-                            if (didRespawn)
-                            {
-                                game.GetArenaGameSession.SpawnPlayers(game.GetArenaGameSession.room, new List<int>(game.GetArenaGameSession.room.abstractRoom.exits));
-                                game.cameras[0].hud.AddPart(new OnlineHUD(game.cameras[0].hud, game.cameras[0], arena));
 
-                            }
-                            didRespawn = false;
 
                             break;
                     }

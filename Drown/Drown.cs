@@ -17,8 +17,6 @@ namespace Drown
 
         public override bool IsExitsOpen(ArenaOnlineGameMode arena, On.ArenaBehaviors.ExitManager.orig_ExitsOpen orig, ArenaBehaviors.ExitManager self)
         {
-            RainMeadow.RainMeadow.Debug(currentPoints);
-            RainMeadow.RainMeadow.Debug(scoreToWin);
             if (currentPoints >= scoreToWin)
             {
                 return true;
