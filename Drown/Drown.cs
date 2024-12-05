@@ -24,8 +24,9 @@ namespace Drown
         public bool isInStore = false;
 
         public static int currentPoints;
+        public static bool openedDen = false;
+
         private int _timerDuration;
-        public bool openedDen = false;
         private int waveStart = 1200;
         private int currentWaveTimer = 1200;
 
@@ -78,6 +79,25 @@ namespace Drown
 
         }
 
+        public override void Killing(ArenaOnlineGameMode arena, On.ArenaGameSession.orig_Killing orig, ArenaGameSession self, Player player, Creature killedCrit, int playerIndex)
+        {
+            
+            currentPoints++;
+            
+            self.arenaSitting.players[playerIndex].score = currentPoints;
+            if (!self.GameTypeSetup.spearsHitPlayers) // team work makes the dream work
+            {
+                for (int i = 0; i < arena.arenaSittingOnlineOrder.Count; i++)
+                {
+                    var currentPlayer = ArenaHelpers.FindOnlinePlayerByFakePlayerNumber(arena, i);
+                    if (!currentPlayer.isMe)
+                    {
+                        currentPlayer.InvokeOnceRPC(DrownModeRPCs.Arena_IncrementPlayerScore, currentPoints);
+                    }
+                }
+            }
+        }
+
         public override int TimerDuration
         {
             get { return _timerDuration; }
@@ -106,7 +126,7 @@ namespace Drown
                     var currentPlayer = ArenaHelpers.FindOnlinePlayerByFakePlayerNumber(arena, i);
                     if (!currentPlayer.isMe)
                     {
-                        currentPlayer.InvokeOnceRPC(Arena_IncrementPlayerScore, currentPoints);
+                        currentPlayer.InvokeOnceRPC(DrownModeRPCs.Arena_IncrementPlayerScore, currentPoints);
                     }
                 }
             }
@@ -122,7 +142,7 @@ namespace Drown
         {
             return arena.countdownInitiatedHoldFire = false;
         }
-        public override string AddCustomIcon(ArenaOnlineGameMode arena)
+        public override string AddCustomIcon(ArenaOnlineGameMode arena, PlayerSpecificOnlineHud hud)
         {
             if (isInStore)
             {
@@ -130,19 +150,22 @@ namespace Drown
 
             } else
             {
-                return base.AddCustomIcon(arena);
+                return base.AddCustomIcon(arena, hud);
             }
         }
 
         public override void ArenaSessionUpdate(ArenaOnlineGameMode arena, ArenaGameSession session)
         {
-            for (int i = 0; i < session.Players.Count; i++)
+            if (session.GameTypeSetup.spearsHitPlayers)
             {
-                if (!session.sessionEnded)
+                for (int i = 0; i < session.Players.Count; i++)
                 {
-                    if (session.exitManager.IsPlayerInDen(session.Players[i]))
+                    if (!session.sessionEnded)
                     {
-                        session.EndSession();
+                        if (session.exitManager.IsPlayerInDen(session.Players[i]))
+                        {
+                            session.EndSession();
+                        }
                     }
                 }
             }
@@ -158,13 +181,7 @@ namespace Drown
             }
 
         }
-        [RainMeadow.RPCMethod]
-        public static void Arena_IncrementPlayerScore(RPCEvent rpcEvent, int score)
-        {
 
-            currentPoints++;
-
-        }
 
     }
 }
