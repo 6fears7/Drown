@@ -114,7 +114,7 @@ namespace Drown
             this.pos = new Vector2(180, 553);
             this.pages[0].subObjects.Add(new Menu.MenuLabel(this, this.pages[0], this.Translate("STORE"), new(pos.x, pos.y + 30f), new(110, 30), true));
             var storeItems = new Dictionary<string, int> {
-            { "Spear", 0 },
+            { "Spear", 1 },
             { "Explosive Spear", 3 },
             { "Scavenger Bomb", 3 },
             { "Revive", 5 },
