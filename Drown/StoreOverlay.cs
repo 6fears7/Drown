@@ -166,6 +166,11 @@ namespace Drown
                         storeItemList[i].button.buttonBehav.greyedOut = true;
 
                     }
+                    if (storeItemList[i].name == "Revive" && foundMe is not null && foundMe.state.alive)
+                    {
+                        storeItemList[i].button.buttonBehav.greyedOut = true;
+
+                    }
                     else
                     {
                         storeItemList[i].button.buttonBehav.greyedOut = DrownMode.currentPoints < storeItemList[i].cost;
@@ -217,17 +222,13 @@ namespace Drown
                             absRoom.creatures.Remove(oe.apo as AbstractCreature);
 
                             absRoom.realizedRoom.RemoveObject(oe.apo.realizedObject);
-                            //absRoom.realizedRoom.rooroom.CleanOutObjectNotInThisRoom(oe.apo.realizedObject);
                             oe.beingMoved = false;
                         }
                     }
                 }
             }
 
-            //if (player != null)
-            //{
-            //    game.Players.Remove(player);
-            //}
+
             //RainMeadow.RainMeadow.sSpawningAvatar = true;
             //AbstractCreature abstractCreature = new AbstractCreature(game.room.world, StaticWorld.GetCreatureTemplate("Slugcat"), null, new WorldCoordinate(0, -1, -1, -1), player?.ID ?? new EntityID(-1, 0));
 
