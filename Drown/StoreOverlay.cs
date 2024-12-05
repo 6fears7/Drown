@@ -85,7 +85,7 @@ namespace Drown
                                 (game.cameras[0].room.abstractRoom).AddEntity(desiredObject);
                                 desiredObject.RealizeInRoom();
                             }
-                            drown.currentPoints = drown.currentPoints - itemEntry.Value;
+                            DrownMode.currentPoints = DrownMode.currentPoints - itemEntry.Value;
                         }
                     }
                 };
@@ -118,7 +118,7 @@ namespace Drown
             { "Explosive Spear", 3 },
             { "Scavenger Bomb", 3 },
             { "Revive", 5 },
-            { "Open Den", 50 },
+            { "Open Den", 30 },
 
 
         };
@@ -165,7 +165,7 @@ namespace Drown
                     }
                     else
                     {
-                        storeItemList[i].button.buttonBehav.greyedOut = drown.currentPoints < storeItemList[i].cost;
+                        storeItemList[i].button.buttonBehav.greyedOut = DrownMode.currentPoints < storeItemList[i].cost;
                     }
                 }
 

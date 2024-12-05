@@ -9,9 +9,21 @@ namespace Drown
     {
 
         public static ArenaSetup.GameTypeID Drown = new ArenaSetup.GameTypeID("Drown", register: true);
+
+        //public static bool isDrownModeMode(out DrownMode gameMode)
+        //{
+        //    gameMode = null;
+        //    if (OnlineManager.lobby != null && OnlineManager.lobby.gameMode is ArenaOnlineGameMode arena && arena.currentGameMode == Drown.value)
+        //    {
+        //        gameMode = (arena.onlineArenaGameMode as DrownMode);
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
         public bool isInStore = false;
 
-        public int currentPoints;
+        public static int currentPoints;
         private int _timerDuration;
         public bool openedDen = false;
         private int waveStart = 1200;
@@ -45,7 +57,7 @@ namespace Drown
             self.rainWhenOnePlayerLeft = false;
             self.levelItems = true;
             self.fliesSpawn = true;
-            self.saveCreatures = true;
+            self.saveCreatures = false;
 
         }
 
@@ -85,8 +97,19 @@ namespace Drown
 
         public override void LandSpear(ArenaOnlineGameMode arena, ArenaGameSession self, Player player, Creature target, ArenaSitting.ArenaPlayer aPlayer)
         {
-            aPlayer.score++;
-            currentPoints = aPlayer.score;
+            currentPoints++;
+            aPlayer.score = currentPoints;
+            if (!self.GameTypeSetup.spearsHitPlayers) // team work makes the dream work
+            {
+                for (int i = 0; i < arena.arenaSittingOnlineOrder.Count; i++)
+                {
+                    var currentPlayer = ArenaHelpers.FindOnlinePlayerByFakePlayerNumber(arena, i);
+                    if (!currentPlayer.isMe)
+                    {
+                        currentPlayer.InvokeOnceRPC(Arena_IncrementPlayerScore, currentPoints);
+                    }
+                }
+            }
         }
 
         public override void HUD_InitMultiplayerHud(ArenaOnlineGameMode arena, HUD.HUD self, ArenaGameSession session)
@@ -133,6 +156,13 @@ namespace Drown
             {
                 session.SpawnCreatures();
             }
+
+        }
+        [RainMeadow.RPCMethod]
+        public static void Arena_IncrementPlayerScore(RPCEvent rpcEvent, int score)
+        {
+
+            currentPoints++;
 
         }
 
