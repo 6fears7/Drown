@@ -1,10 +1,9 @@
 ﻿using Menu;
 using On.MoreSlugcats;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
 using UnityEngine;
 using RainMeadow;
+using System.Linq;
 
 namespace Drown
 {
@@ -44,10 +43,10 @@ namespace Drown
                         if (OnlinePhysicalObject.map.TryGetValue(game.GetArenaGameSession.Players[i], out var onlineP) && onlineP.owner == OnlineManager.mePlayer)
                         {
                             me = game.GetArenaGameSession.Players[i];
-                        } 
+                        }
                     }
 
-                        switch (index)
+                    switch (index)
                     {
                         case 0:
                             desiredObject = new AbstractSpear(game.world, null, me.pos, game.GetNewID(), false);
@@ -61,10 +60,10 @@ namespace Drown
 
                         case 3:
 
-                                didRespawn = false;
-                                RevivePlayer(game.GetArenaGameSession, arena, me);
-                                didRespawn = true;
-                            
+                            didRespawn = false;
+                            RevivePlayer(game.GetArenaGameSession, arena);
+                            didRespawn = true;
+
                             break;
                         case 4:
                             DrownMode.openedDen = true;
@@ -181,7 +180,7 @@ namespace Drown
             }
         }
 
-        private static void RevivePlayer(ArenaGameSession game, ArenaOnlineGameMode arena, AbstractCreature player)
+        private static void RevivePlayer(ArenaGameSession game, ArenaOnlineGameMode arena)
         {
 
 
@@ -191,89 +190,8 @@ namespace Drown
             {
                 exitList.Add(i);
             }
-
-
-
+            arena.avatars.Clear();
             arena.onlineArenaGameMode.SpawnPlayer(arena, game, game.room, exitList);
-            game.game.cameras[0].hud.AddPart(new OnlineHUD(game.game.cameras[0].hud, game.game.cameras[0], arena));
-
-            var absRoom = game.room.abstractRoom;
-            if (RoomSession.map.TryGetValue(game.room.abstractRoom, out var roomSession))
-            {
-                // we go over all APOs in the room
-                var entities = absRoom.entities;
-                for (int i = entities.Count - 1; i >= 0; i--)
-                {
-                    if (entities[i] is AbstractPhysicalObject apo && OnlinePhysicalObject.map.TryGetValue(apo, out var oe))
-                    {
-                        if (oe.isMine && oe.apo is AbstractCreature && (oe.apo as AbstractCreature).state.dead)
-                        {
-                            oe.apo.LoseAllStuckObjects();
-                            // not-online-aware removal
-                            oe.beingMoved = true;
-
-                            if (oe.apo.realizedObject is Creature c && c.inShortcut)
-                            {
-                                if (c.RemoveFromShortcuts()) c.inShortcut = false;
-                            }
-
-                            entities.Remove(oe.apo);
-
-                            absRoom.creatures.Remove(oe.apo as AbstractCreature);
-
-                            absRoom.realizedRoom.RemoveObject(oe.apo.realizedObject);
-                            oe.beingMoved = false;
-                        }
-                    }
-                }
-            }
-
-
-            //RainMeadow.RainMeadow.sSpawningAvatar = true;
-            //AbstractCreature abstractCreature = new AbstractCreature(game.room.world, StaticWorld.GetCreatureTemplate("Slugcat"), null, new WorldCoordinate(0, -1, -1, -1), player?.ID ?? new EntityID(-1, 0));
-
-            //abstractCreature.pos.room = game.room.abstractRoom.index;
-            //abstractCreature.pos.abstractNode = game.room.ShortcutLeadingToNode(0).destNode;
-
-            //RainMeadow.RainMeadow.Debug("assigned ac, registering");
-
-            //game.game.world.GetResource().ApoEnteringWorld(abstractCreature);
-            //RainMeadow.RainMeadow.sSpawningAvatar = false;
-
-            //if (ModManager.MSC)
-            //{
-            //    game.game.cameras[0].followAbstractCreature = abstractCreature;
-            //}
-
-            //if (abstractCreature.GetOnlineObject(out var oe) && oe.TryGetData<SlugcatCustomization>(out var customization))
-            //{
-            //    abstractCreature.state = new PlayerState(abstractCreature, ArenaHelpers.FindOnlinePlayerNumber(arena, oe.owner), customization.playingAs, isGhost: false);
-
-            //}
-            //else
-            //{
-            //    RainMeadow.RainMeadow.Error("Could not get online owner for spawned player!");
-            //    abstractCreature.state = new PlayerState(abstractCreature, 0, game.characterStats_Mplayer[0].name, isGhost: false);
-            //}
-
-            //RainMeadow.RainMeadow.Debug("Arena: Realize Creature!");
-            //abstractCreature.Realize();
-
-            //if (abstractCreature.pos.abstractNode > abstractCreature.Room.exits) abstractCreature.pos.abstractNode = UnityEngine.Random.Range(0, abstractCreature.Room.exits);
-
-
-
-            //var shortCutVessel = new ShortcutHandler.ShortCutVessel(abstractCreature.Room.realizedRoom.ShortcutLeadingToNode(abstractCreature.pos.abstractNode).DestTile, abstractCreature.realizedCreature, game.room.world.GetAbstractRoom(0), 0);
-
-            //shortCutVessel.entranceNode = abstractCreature.pos.abstractNode;
-            //shortCutVessel.room = game.room.world.GetAbstractRoom(abstractCreature.Room.name);
-
-            //game.game.shortcuts.betweenRoomsWaitingLobby.Add(shortCutVessel);
-
-            if (player != null)
-            {
-                game.game.world.GetResource().ApoLeavingWorld(player);
-            }
 
 
         }
