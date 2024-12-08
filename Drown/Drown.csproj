@@ -47,10 +47,6 @@
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\BepInEx\core\0Harmony20.dll</HintPath>
 	    <Private>False</Private>
 	  </Reference>
-	  <Reference Include="Assembly-CSharp">
-	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Assembly-CSharp.dll</HintPath>
-	    <Private>False</Private>
-	  </Reference>
 	  <Reference Include="BepInEx">
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
 	    <Private>False</Private>
@@ -103,15 +99,21 @@
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\BepInEx\core\MonoMod.Utils.dll</HintPath>
 	    <Private>False</Private>
 	  </Reference>
+	  <Reference Include="Assembly-CSharp">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
 	  <Reference Include="Rain Meadow">
 	    <HintPath>..\..\Rain-Meadow\Mod\plugins\Rain Meadow.dll</HintPath>
 	    <Private>False</Private>
 	  </Reference>
 	  <Reference Include="Rewired_Core">
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Rewired_Core.dll</HintPath>
+	    <Private>False</Private>
 	  </Reference>
 	  <Reference Include="UnityEngine">
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
+	    <Private>False</Private>
 	  </Reference>
 	  <Reference Include="UnityEngine.CoreModule">
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
@@ -119,9 +121,11 @@
 	  </Reference>
 	  <Reference Include="UnityEngine.InputLegacyModule">
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+	    <Private>False</Private>
 	  </Reference>
 	  <Reference Include="UnityEngine.InputModule">
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+	    <Private>False</Private>
 	  </Reference>
 	</ItemGroup>
 
@@ -324,8 +328,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="DrownGameMode\" />
-	  <Folder Include="Hud\" />
 	  <Folder Include="Mod\plugins\" />
 	</ItemGroup>
 
